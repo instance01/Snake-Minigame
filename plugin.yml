@@ -5,6 +5,6 @@ author: instancelabs
 depend: [LibsDisguises]
 commands:
    snake:
-      description: Moves the player
-      usage: /move
+      description: Main Command
+      usage: /snake
       aliases: [sc]

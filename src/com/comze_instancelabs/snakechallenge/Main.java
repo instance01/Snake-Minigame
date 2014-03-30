@@ -173,7 +173,12 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		
 		registerEntities();
-		
+	
+		try {
+			Metrics metrics = new Metrics(this);
+			metrics.start();
+		} catch (IOException e) {
+		}
 	}
 
 	private boolean setupEconomy() {
