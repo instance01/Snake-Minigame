@@ -1347,7 +1347,7 @@ public class Main extends JavaPlugin implements Listener {
 				determineWinners(arena);
 				
 				ArrayList<Player> torem = new ArrayList<Player>();
-				determineWinners(arena);
+
 				for (Player p : arenap.keySet()) {
 					if (arenap.get(p).equalsIgnoreCase(arena)) {
 						p.setWalkSpeed(0.2F);
