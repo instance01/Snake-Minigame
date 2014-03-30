@@ -1,7 +1,8 @@
-package com.comze_instancelabs.snakechallenge;
+package com.comze_instancelabs.snakechallenge.v1_7_2;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.server.v1_7_R1.DamageSource;
@@ -9,6 +10,7 @@ import net.minecraft.server.v1_7_R1.EntityComplexPart;
 import net.minecraft.server.v1_7_R1.EntityHuman;
 import net.minecraft.server.v1_7_R1.EntityMonster;
 import net.minecraft.server.v1_7_R1.EntitySheep;
+import net.minecraft.server.v1_7_R1.EntityTypes;
 import net.minecraft.server.v1_7_R1.PathfinderGoal;
 import net.minecraft.server.v1_7_R1.PathfinderGoalHurtByTarget;
 import net.minecraft.server.v1_7_R1.PathfinderGoalLookAtPlayer;
@@ -20,13 +22,15 @@ import net.minecraft.server.v1_7_R1.World;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-public class MESheep extends EntitySheep {
+import com.comze_instancelabs.snakechallenge.Main;
+
+public class MESheep1_7_2 extends EntitySheep {
 
 	private boolean onGround = false;
 	private Main m;
 	private String arena;
 	
-	public MESheep(Main m, String arena, Location loc, World world) {
+	public MESheep1_7_2(Main m, String arena, Location loc, World world) {
 		super(world);
 		this.m = m;
 		this.arena = arena;

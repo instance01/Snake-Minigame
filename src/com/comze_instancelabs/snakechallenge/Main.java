@@ -1,12 +1,6 @@
 package com.comze_instancelabs.snakechallenge;
 
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,9 +15,6 @@ import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import me.libraryaddict.disguise.disguisetypes.watchers.SheepWatcher;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
-import net.minecraft.server.v1_7_R1.EntityTypes;
-import net.minecraft.server.v1_7_R1.Navigation;
-import net.minecraft.server.v1_7_R1.PathEntity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,13 +23,10 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -46,9 +34,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -61,8 +47,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
+
+import com.comze_instancelabs.snakechallenge.v1_7_2.MESheep1_7_2;
+import com.comze_instancelabs.snakechallenge.v1_7_2.register1_7_2;
+import com.comze_instancelabs.snakechallenge.v1_7_5.MESheep1_7_5;
+import com.comze_instancelabs.snakechallenge.v1_7_5.register1_7_5;
+//import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 
 
 public class Main extends JavaPlugin implements Listener {
@@ -81,6 +71,11 @@ public class Main extends JavaPlugin implements Listener {
 	public static HashMap<String, Integer> a_currentw = new HashMap<String, Integer>();
 
 	public static HashMap<String, Integer> pteam = new HashMap<String, Integer>();
+	
+	
+	public boolean v1_7_2 = true;
+	public boolean v1_7_5 = false;
+	
 	
 	int rounds_per_game = 10;
 	//int minplayers = 4;
@@ -172,7 +167,21 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 		
-		registerEntities();
+		if (Bukkit.getVersion().contains("MC: 1.6.4") || Bukkit.getVersion().contains("1.6.2")) {
+			//TODO 1.6.4
+			v1_7_2 = false;
+			v1_7_5 = false;
+			getLogger().info("Turned on 1.6.4 mode.");
+		}else if(Bukkit.getVersion().contains("MC: 1.7.5")){
+			v1_7_5 = true;
+			v1_7_2 = false;
+			register1_7_5.registerEntities();
+			getLogger().info("Turned on 1.7.5 mode.");
+		}else{
+			v1_7_2 = true;
+			register1_7_2.registerEntities();
+		}
+		
 	
 		try {
 			Metrics metrics = new Metrics(this);
@@ -1080,8 +1089,14 @@ public class Main extends JavaPlugin implements Listener {
 	    		Vector v = p.getLocation().getDirection().normalize();
 				Location l = p.getLocation().subtract((new Vector(v.getX(), 0.0001D, v.getZ())));
 				Location l_ = p.getLocation().subtract((new Vector(v.getX(), 0.0001D, v.getZ()).multiply(2D)));
-				ArrayList<MESheep> temp = new ArrayList<MESheep>(Arrays.asList(spawnSheep(m, arena, l.add(0D, 1D, 0D), pteam.get(p.getName())), spawnSheep(m, arena, l_.add(0D, 1D, 0D), pteam.get(p.getName()))));
-				psheep.put(p, temp);
+				if(v1_7_2){
+					ArrayList<MESheep1_7_2> temp = new ArrayList<MESheep1_7_2>(Arrays.asList(register1_7_2.spawnSheep(m, arena, l.add(0D, 1D, 0D), pteam.get(p.getName())), register1_7_2.spawnSheep(m, arena, l_.add(0D, 1D, 0D), pteam.get(p.getName()))));
+					psheep1_7_2.put(p, temp);
+				}else if(v1_7_5){
+					ArrayList<MESheep1_7_5> temp = new ArrayList<MESheep1_7_5>(Arrays.asList(register1_7_5.spawnSheep(m, arena, l.add(0D, 1D, 0D), pteam.get(p.getName())), register1_7_5.spawnSheep(m, arena, l_.add(0D, 1D, 0D), pteam.get(p.getName()))));
+					psheep1_7_5.put(p, temp);
+				}
+				
 			}
 		}
 		
@@ -1132,9 +1147,15 @@ public class Main extends JavaPlugin implements Listener {
 								for (Player p_ : arenap.keySet()) {
 									if (arenap.get(p_).equalsIgnoreCase(arena)) {
 										if (!lost.containsKey(p_)) {
-											ArrayList<MESheep> temp = new ArrayList<MESheep>(psheep.get(p_));
-											temp.add(m.spawnSheep(m, arena, p_.getLocation(), pteam.get(p.getName())));
-											psheep.put(p, temp);
+											if(v1_7_2){
+												ArrayList<MESheep1_7_2> temp = new ArrayList<MESheep1_7_2>(psheep1_7_2.get(p_));
+												temp.add(register1_7_2.spawnSheep(m, arena, p_.getLocation(), pteam.get(p.getName())));
+												psheep1_7_2.put(p, temp);
+											}else if(v1_7_5){
+												ArrayList<MESheep1_7_5> temp = new ArrayList<MESheep1_7_5>(psheep1_7_5.get(p_));
+												temp.add(register1_7_5.spawnSheep(m, arena, p_.getLocation(), pteam.get(p.getName())));
+												psheep1_7_5.put(p, temp);
+											}
 										}
 									}
 								}
@@ -1201,7 +1222,10 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public HashMap<Player, ArrayList<Location>> plocs = new HashMap<Player, ArrayList<Location>>();
 	public HashMap<String, Integer> arenasize = new HashMap<String, Integer>();
-	public HashMap<Player, ArrayList<MESheep>> psheep = new HashMap<Player, ArrayList<MESheep>>();
+	
+	public HashMap<Player, ArrayList<MESheep1_7_2>> psheep1_7_2 = new HashMap<Player, ArrayList<MESheep1_7_2>>();
+	public HashMap<Player, ArrayList<MESheep1_7_5>> psheep1_7_5 = new HashMap<Player, ArrayList<MESheep1_7_5>>();
+
 	public HashMap<Player, ArrayList<Vector>> pvecs = new HashMap<Player, ArrayList<Vector>>();
 
 	private void updateLocs(String arena){
@@ -1229,19 +1253,27 @@ public class Main extends JavaPlugin implements Listener {
 						plocs.put(p_, temp);
 												
 						int c = 0;
-						for(MESheep ms : psheep.get(p_)){
-							if(c < pvecs.get(p_).size()){
-
-								Vector direction = plocs.get(p_).get(c).toVector().subtract(psheep.get(p_).get(c).getBukkitEntity().getLocation().toVector()).normalize();
-								
-								psheep.get(p_).get(c).setYaw(plocs.get(p_).get(c));
-								
-								psheep.get(p_).get(c).getBukkitEntity().setVelocity(direction.multiply(0.5D));
-								//psheep.get(p_).get(c).getBukkitEntity().setVelocity(pvecs.get(p_).get(c));
-
-								c++;
+						
+						if(v1_7_2){
+							for(MESheep1_7_2 ms : psheep1_7_2.get(p_)){
+								if(c < pvecs.get(p_).size()){
+									Vector direction = plocs.get(p_).get(c).toVector().subtract(psheep1_7_2.get(p_).get(c).getBukkitEntity().getLocation().toVector()).normalize();
+									psheep1_7_2.get(p_).get(c).setYaw(plocs.get(p_).get(c));
+									psheep1_7_2.get(p_).get(c).getBukkitEntity().setVelocity(direction.multiply(0.5D));
+									c++;
+								}
+							}
+						}else if(v1_7_5){
+							for(MESheep1_7_5 ms : psheep1_7_5.get(p_)){
+								if(c < pvecs.get(p_).size()){
+									Vector direction = plocs.get(p_).get(c).toVector().subtract(psheep1_7_5.get(p_).get(c).getBukkitEntity().getLocation().toVector()).normalize();
+									psheep1_7_5.get(p_).get(c).setYaw(plocs.get(p_).get(c));
+									psheep1_7_5.get(p_).get(c).getBukkitEntity().setVelocity(direction.multiply(0.5D));
+									c++;
+								}
 							}
 						}
+						
 					}
 				}
 			}
@@ -1249,59 +1281,6 @@ public class Main extends JavaPlugin implements Listener {
 	}
 	
 
-	
-	public MESheep spawnSheep(Main m, String arena, Location t, final int color) {
-		final Object w = ((CraftWorld) t.getWorld()).getHandle();
-		final MESheep t_ = new MESheep(m, arena, t, (net.minecraft.server.v1_7_R1.World) ((CraftWorld) t.getWorld()).getHandle());
-
-		Bukkit.getScheduler().runTask(this, new Runnable(){
-			public void run(){
-				((net.minecraft.server.v1_7_R1.World) w).addEntity(t_, CreatureSpawnEvent.SpawnReason.CUSTOM);
-				t_.setColor(color);
-			}
-		});
-		
-		return t_;
-	}
-	
-	public static boolean registerEntities(){
-		
-		try {
-			Class entityTypeClass = EntityTypes.class;
-
-			Field c = entityTypeClass.getDeclaredField("c");
-			c.setAccessible(true);
-			HashMap c_map = (HashMap) c.get(null);
-			c_map.put("MESheep", MESheep.class);
-
-			Field d = entityTypeClass.getDeclaredField("d");
-			d.setAccessible(true);
-			HashMap d_map = (HashMap) d.get(null);
-			d_map.put(MESheep.class, "MESheep");
-
-			Field e = entityTypeClass.getDeclaredField("e");
-			e.setAccessible(true);
-			HashMap e_map = (HashMap) e.get(null);
-			e_map.put(Integer.valueOf(91), MESheep.class);
-
-			Field f = entityTypeClass.getDeclaredField("f");
-			f.setAccessible(true);
-			HashMap f_map = (HashMap) f.get(null);
-			f_map.put(MESheep.class, Integer.valueOf(91));
-
-			Field g = entityTypeClass.getDeclaredField("g");
-			g.setAccessible(true);
-			HashMap g_map = (HashMap) g.get(null);
-			g_map.put("MESheep", Integer.valueOf(91));
-
-			return true;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return false;
-		}
-	}
-	
-	
 
 	public void stop(BukkitTask t, final String arena) {
 		ingame.put(arena, false);
