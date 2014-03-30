@@ -1,0 +1,10 @@
+name: SnakeChallenge
+main: com.comze_instancelabs.snakechallenge.Main
+version: 1.0
+author: instancelabs
+depend: [LibsDisguises]
+commands:
+   snake:
+      description: Moves the player
+      usage: /move
+      aliases: [sc]
