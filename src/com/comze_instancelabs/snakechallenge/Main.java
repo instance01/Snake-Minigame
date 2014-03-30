@@ -1093,7 +1093,12 @@ public class Main extends JavaPlugin implements Listener {
 			public void run(){
 				for(Player p : arenap.keySet()){
 					if(arenap.get(p).equalsIgnoreCase(arena)){
-						Vector dir = p.getLocation().getDirection().normalize().multiply(0.4D);
+						/*if(p.getLocation().getPitch() < -10F || p.getLocation().getPitch() > 10F){
+							p.getLocation().setPitch(0F);
+						}*/
+						Location l_ = p.getLocation();
+						l_.setPitch(0F);
+						Vector dir = l_.getDirection().normalize().multiply(0.4D);
 						Vector dir_ = new Vector(dir.getX(), 0.0001D, dir.getZ());
 						p.setVelocity(dir_);
 
