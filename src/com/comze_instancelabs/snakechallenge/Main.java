@@ -167,6 +167,12 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 		
+		
+		if (getConfig().getBoolean("config.auto_updating")) {
+			Updater updater = new Updater(this, 77184, this.getFile(), Updater.UpdateType.DEFAULT, false);
+		}
+		
+		
 		if (Bukkit.getVersion().contains("MC: 1.6.4") || Bukkit.getVersion().contains("1.6.2")) {
 			//TODO 1.6.4
 			v1_7_2 = false;
